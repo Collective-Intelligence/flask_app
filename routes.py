@@ -17,7 +17,7 @@ from flask_app import forms
 @flask_app.route('/index')
 def index():
     user = {'username': 'Miguel'}
-    var_thing = add.delay(10,10).wait()
+    #var_thing = login.delay("anarchyhasnogods","postingkey").wait()
     return render_template('index.html', title="title", user=user)
 
 
