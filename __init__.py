@@ -1,23 +1,24 @@
-from flask import Flask, render_template, url_for
+from flask import Flask
 from flask_app.config import Config
-from celery import Celery
-from flask_app.forms import LoginForm
-import json
-var_thing = 10
-
-
 import socket
-import threading
+from celery import Celery
+import json
 import time
-TCP_IP = '127.0.0.1'
-TCP_PORT = 5005
-BUFFER_SIZE = 1024
 
 flask_app = Flask(__name__)
 flask_app.config.from_object(Config)
 
 
+
+
+
+
+TCP_IP = '127.0.0.1'
+TCP_PORT = 5005
+BUFFER_SIZE = 1024
+
 def make_celery(app):
+
     celery = Celery(app.import_name, backend=app.config['CELERY_RESULT_BACKEND'],
                     broker=app.config['CELERY_BROKER_URL'])
     celery.conf.update(app.config)
@@ -29,24 +30,97 @@ def make_celery(app):
                 return TaskBase.__call__(self, *args, **kwargs)
     celery.Task = ContextTask
     return celery
-
-
-flask_app = Flask(__name__)
 flask_app.config.update(
     CELERY_BROKER_URL='redis://localhost:6379',
     CELERY_RESULT_BACKEND='redis://localhost:6379'
 )
+
 celery = make_celery(flask_app)
 
-#objthing = object_thing.TestObj()
+
 @celery.task
-def login(user_name,posting_key):
+def login_celery(user_name,posting_key):
+    print("here")
+    # creates json to send to communication backend to create a session for the user, on login
     json_object = json.dumps({"action":"create_session", "key":posting_key,"steem-name":user_name})
 
     print(1)
-    return send_json(json_object)
+    return send_json_account(json_object)
 
-def send_json(MESSAGE):
+@celery.task
+def buy_token(token,amount,user,key):
+    json_object = json.dumps({"action":{"type":"account","action_type":"make_purchase","amount": amount,"token_type": token,"use-steem":"False"},"key":key,"steem-name":user})
+    return send_json_account(json_object)
+
+
+@celery.task
+def create_curation_session(user,key,tag):
+    json_object = json.dumps({"action":{"type":"create_session", "tag":tag},"key":key,"steem-name":user})
+    return send_json_curation(json_object)
+
+
+@celery.task
+def add_post_curation(user,key,tag,post_link):
+    json_object = json.dumps(
+        {"action": {"type": "account", "tag": tag,"action_type":"submit_post","post-link":post_link}, "key": key, "steem-name": user})
+    return send_json_curation(json_object)
+
+
+def send_json_curation(MESSAGE):
+    time_out = 300
+    global TCP_PORT, TCP_IP, BUFFER_SIZE
+
+    return_object = False
+    print(2)
+    try:
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((TCP_IP, TCP_PORT+1))
+        s.send(MESSAGE.encode())
+        data = ""
+        print(3)
+        while True:
+            new_data = s.recv(BUFFER_SIZE)
+            new_data = new_data.decode()
+            data += new_data
+            if not new_data: break
+            if not len(new_data) > 0: break
+            if not len(new_data) > BUFFER_SIZE: break
+        id = json.loads(data)["idnum"]
+        data = ""
+        times = 0
+        # waits until the task is done by the communication backend
+        while not return_object or return_object == "404":
+            data = ""
+            times += 1
+            if times > time_out:
+                return False
+            time.sleep(1)
+            MESSAGE = json.dumps({"action": "return_json", "idnum": id})
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((TCP_IP, TCP_PORT+1))
+            s.send(MESSAGE.encode())
+            while True:
+                new_data = s.recv(BUFFER_SIZE)
+                new_data = new_data.decode()
+                data += new_data
+                if not new_data: break
+                if not len(new_data) > 0: break
+                if not len(new_data) > BUFFER_SIZE: break
+
+            if data != "":
+                return_object = data
+
+
+    except Exception as e:
+        print(e)
+        pass
+
+    return return_object
+
+def send_json_account(MESSAGE):
+    # takes json made by celery functions and sends it to the communication backend
+    # then waits on the backend, checking in once a second, to get the return json
     time_out = 300
     global TCP_PORT, TCP_IP, BUFFER_SIZE
     return_object = False
@@ -69,6 +143,7 @@ def send_json(MESSAGE):
         id = json.loads(data)["idnum"]
         data = ""
         times = 0
+        # waits until the task is done by the communication backend
         while not return_object or return_object == "404":
             data = ""
             times +=1
@@ -96,7 +171,8 @@ def send_json(MESSAGE):
         pass
 
     return return_object
+    celery.Task = ContextTask
+    return celery
 
 
 from flask_app import routes
-
