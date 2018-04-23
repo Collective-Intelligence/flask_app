@@ -1,6 +1,4 @@
 <!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><title>Collective Intelligence</title>
-
-{% raw %}
 	<link rel="stylesheet" href="/static/assets/style/main.css"
 	><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons|Noto+Sans"><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width"><script src="static/scripts/handlebars.js"></script><script src="/static/scripts/page.js"></script><!--script#template__account(type="text/x-handlebars-template"): include ../templates/account.hbs--><!--script#template__curation(type="text/x-handlebars-template"): include ../templates/curation.hbs--><!--script#template__delegation(type="text/x-handlebars-template"): include ../templates/delegation.hbs--><!--script#template__dropdown(type="text/x-handlebars-template"): include ../templates/dropdown.hbs--><!--script#template__dropdown2(type="text/x-handlebars-template"): include ../templates/dropdown2.hbs--><script id="template__sidebar" type="text/x-handlebars-template">{{#each sections}}
 	{{#if name}}
@@ -23,7 +21,14 @@
 {{/each}}
 </script>
 
-
+<form action="/login" method=post>
+    <dl>
+      <dt>Username:
+      <dd><input type=text name=username>
+      <dt>Password:
+      <dd><input type=password name=password>
+      <dd><input type=submit value=Login>
+    </dl>
 
 <!--script#template__tokens(type="text/x-handlebars-template"): include ../templates/tokens.hbs--><script id="template__test" type="text/x-handlebars-template"><div
     class="card module"
@@ -45,34 +50,4 @@
 
 	<div class="nav__option material-icons" id="nav__edit" onclick="_ci.ui.edit()">build</div></div><div class="side"><div class="drawer side__bar">
 
-		<div class="side__content"></div></div></div><div id="mContainer"></div></body>
-
-{% endraw %}
-
-
-<br><br><br><br><br><br><br><br>
-<div style="top:600px;left:600px;">
-<h1>Sign In</h1>
-
-<form action="" method="post">
-	{{ form.csrf_token }}
-		<p>
-				{{ form.username.label }}<br>
-				{{ form.username(size=32) }}<br>
-				{% for error in form.username.errors %}
-				<span style="color: red;">[{{ error }}]</span>
-				{% endfor %}
-		</p>
-		<p>
-				{{ form.password.label }}<br>
-				{{ form.password(size=32) }}<br>
-				{% for error in form.password.errors %}
-				<span style="color: red;">[{{ error }}]</span>
-				{% endfor %}
-		</p>
-		<p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-		<p>{{ form.submit() }}</p>
-
-</form>
-</div>
-		</html>
+		<div class="side__content"></div></div></div><div id="mContainer"></div></body></html>
