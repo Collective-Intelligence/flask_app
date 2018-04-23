@@ -5,6 +5,24 @@ from celery import Celery
 import json
 import time
 
+
+repo_dir = "/home/cuck/Desktop/Projects/flask_app/templates"
+git_url = "https://github.com/Collective-Intelligence/website_start"
+
+import shutil
+import os
+#shutil.rmtree(repo_dir)
+
+#os.mkdir(repo_dir)
+
+
+
+from git import Repo
+
+#Repo.clone_from(git_url, repo_dir)
+
+
+
 flask_app = Flask(__name__)
 flask_app.config.from_object(Config)
 
@@ -58,11 +76,16 @@ def create_curation_session(user,key,tag):
     json_object = json.dumps({"action":{"type":"create_session", "tag":tag},"key":key,"steem-name":user})
     return send_json_curation(json_object)
 
+@celery.task
+def get_session_list(user,key):
+    json_object = json.dumps(
+        {"action": {"type": "session"}, "key": key, "steem-name": user})
+    return send_json_curation(json_object)
 
 @celery.task
 def add_post_curation(user,key,tag,post_link):
     json_object = json.dumps(
-        {"action": {"type": "account", "tag": tag,"action_type":"submit_post","post-link":post_link}, "key": key, "steem-name": user})
+        {"action": {"type": "add_post", "tag": tag,"post-link":post_link}, "key": key, "steem-name": user})
     return send_json_curation(json_object)
 
 
