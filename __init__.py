@@ -61,9 +61,11 @@ def login_celery(user_name,posting_key):
     print("here")
     # creates json to send to communication backend to create a session for the user, on login
     json_object = json.dumps({"action":"create_session", "key":posting_key,"steem-name":user_name})
+    return_info = send_json_account(json_object)
+    return return_info
 
-    print(1)
-    return send_json_account(json_object)
+
+
 
 @celery.task
 def buy_token(token,amount,user,key):
@@ -86,6 +88,25 @@ def get_session_list(user,key):
 def add_post_curation(user,key,tag,post_link):
     json_object = json.dumps(
         {"action": {"type": "add_post", "tag": tag,"post-link":post_link}, "key": key, "steem-name": user})
+    return send_json_curation(json_object)
+
+@celery.task
+def add_post_curation(user,key,tag):
+    json_object = json.dumps(
+        {"action": {"type": "add_post", "tag": tag}, "key": key, "steem-name": user})
+    return send_json_curation(json_object)
+
+
+@celery.task
+def get_post_curation(user,key,tag):
+    json_object = json.dumps(
+        {"action": {"type": "get_post", "tag": tag}, "key": key, "steem-name": user})
+    return send_json_curation(json_object)
+
+@celery.task
+def vote_post_curation(user,key,tag,vote,post_link):
+    json_object = json.dumps(
+        {"action": {"type": "add_vote", "tag": tag,"vote":[user,vote],"post":post_link}, "key": key, "steem-name": user})
     return send_json_curation(json_object)
 
 
@@ -192,10 +213,44 @@ def send_json_account(MESSAGE):
     except Exception as e:
         print(e)
         pass
+    MESSAGE = json.loads(MESSAGE)
+    return_object = json.loads(return_object)
+    print(return_object)
+    has_error = True
+    try:
+        return_object["error"]
+    except:
+        has_error = False
+    if has_error:
+        if type(MESSAGE["action"]) != str:
 
-    return return_object
-    celery.Task = ContextTask
-    return celery
+            xml_object = "<data>" \
+                     ""+"<success>" +str(return_object["success"])+ "</success>"+ \
+                     "" + "<error>" + string(return_object["error"]) + "</error>" \
+                    "" +"<action>"+ MESSAGE["action"]+"</action>"+\
+                    "</data>"
+        else:
+
+            xml_object = "<data>" \
+                     ""+"<success>" +str(return_object["success"])+ "</success>"+ \
+                     "" + "<error>" + str(return_object["error"]) + "</error>" \
+                    "" +"<action>"+ MESSAGE["action"] + "</action>"\
+                    "</data>"
+
+    else:
+        if type(MESSAGE["action"]) != str:
+            xml_object = "<data>" \
+                     "" + "<success>" + str(return_object["success"]) + "</success>" + \
+                     "" + "<action>" + MESSAGE["action"]["type"] or MESSAGE["action"] + "</action>" + \
+                         "</data>"
+        else:
+
+            xml_object = "<data>" \
+                     "" + "<success>" + str(return_object["success"]) + "</success>" + \
+                     "" + "<action>" + MESSAGE["action"] or MESSAGE["action"] + "</action>" + \
+                                                                    "</data>"
+    return xml_object
+
 
 
 from flask_app import routes
