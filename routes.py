@@ -50,3 +50,34 @@ def login():
 
 
     return redirect("/")
+
+
+@flask_app.route('/get_post', methods=['POST'])
+def get_post():
+    password = request.form.getlist("password")[0]
+    username = request.form.getlist("username")[0]
+    tag = request.form.getlist("tag")[0]
+    xml_res = get_post_curation.delay(username, password, tag).wait()
+
+    return Response(xml_res, mimetype='text/xml')
+
+
+@flask_app.route('/create_curation', methods=['POST'])
+def create_curation():
+    password = request.form.getlist("password")[0]
+    username = request.form.getlist("username")[0]
+    tag = request.form.getlist("tag")[0]
+    xml_res = create_curation_session.delay(username, password, tag).wait()
+
+    return Response(xml_res, mimetype='text/xml')
+
+
+@flask_app.route('/add_post', methods=['POST'])
+def add_post():
+    password = request.form.getlist("password")[0]
+    username = request.form.getlist("username")[0]
+    tag = request.form.getlist("tag")[0]
+    post_link = request.form.getlist("post-link")[0]
+    xml_res = add_post_curation.delay(username, password, tag, post_link).wait()
+
+    return Response(xml_res, mimetype='text/xml')

@@ -90,11 +90,6 @@ def add_post_curation(user,key,tag,post_link):
         {"action": {"type": "add_post", "tag": tag,"post-link":post_link}, "key": key, "steem-name": user})
     return send_json_curation(json_object)
 
-@celery.task
-def add_post_curation(user,key,tag):
-    json_object = json.dumps(
-        {"action": {"type": "add_post", "tag": tag}, "key": key, "steem-name": user})
-    return send_json_curation(json_object)
 
 
 @celery.task
@@ -111,6 +106,7 @@ def vote_post_curation(user,key,tag,vote,post_link):
 
 
 def send_json_curation(MESSAGE):
+    og = MESSAGE
     time_out = 300
     global TCP_PORT, TCP_IP, BUFFER_SIZE
 
@@ -159,10 +155,48 @@ def send_json_curation(MESSAGE):
     except Exception as e:
         print(e)
         pass
+    MESSAGE = json.loads(og)
+    return_object = json.loads(return_object)
 
-    return return_object
+    has_error = True
+    try:
+        return_object["error"]
+    except:
+        has_error = False
+    if has_error:
+        if type(MESSAGE["action"]) != str:
+
+            xml_object = "<data>" \
+                         "" + "<success>" + str(return_object["success"]) + "</success>" + \
+                         "" + "<error>" + str(return_object["error"]) + "</error>" \
+                         "" + "<action>" + MESSAGE["action"]["type"] + "</action>" + \
+                         +"</data>"
+        else:
+
+            xml_object = "<data>" \
+                         "" + "<success>" + str(return_object["success"]) + "</success>" + \
+                         "" + "<error>" + str(return_object["error"]) + "</error>" \
+                           "" + "<action>" + MESSAGE["action"] + "</action>" \
+                                         +"</data>"
+
+    else:
+        if type(MESSAGE["action"]) != str:
+            xml_object = "<data>" \
+                         "" + "<success>" + str(return_object["success"]) + "</success>" + \
+                         "" + "<action>" + MESSAGE["action"]["type"]  + "</action>" + \
+                                                                        "</data>"
+        else:
+
+            xml_object = "<data>" \
+                         "" + "<success>" + str(return_object["success"]) + "</success>" + \
+                         "" + "<action>" +MESSAGE["action"] + "</action>" + \
+                                                                "</data>"
+    return xml_object
+
+    return xml_object
 
 def send_json_account(MESSAGE):
+    og = MESSAGE
     # takes json made by celery functions and sends it to the communication backend
     # then waits on the backend, checking in once a second, to get the return json
     time_out = 300
@@ -213,7 +247,7 @@ def send_json_account(MESSAGE):
     except Exception as e:
         print(e)
         pass
-    MESSAGE = json.loads(MESSAGE)
+    MESSAGE = json.loads(og)
     return_object = json.loads(return_object)
     print(return_object)
     has_error = True
@@ -226,8 +260,8 @@ def send_json_account(MESSAGE):
 
             xml_object = "<data>" \
                      ""+"<success>" +str(return_object["success"])+ "</success>"+ \
-                     "" + "<error>" + string(return_object["error"]) + "</error>" \
-                    "" +"<action>"+ MESSAGE["action"]+"</action>"+\
+                     "" + "<error>" + str(return_object["error"]) + "</error>" \
+                    "" +"<action>"+ MESSAGE["action"]["type"]+"</action>"+\
                     "</data>"
         else:
 
@@ -235,19 +269,19 @@ def send_json_account(MESSAGE):
                      ""+"<success>" +str(return_object["success"])+ "</success>"+ \
                      "" + "<error>" + str(return_object["error"]) + "</error>" \
                     "" +"<action>"+ MESSAGE["action"] + "</action>"\
-                    "</data>"
+                   + "</data>"
 
     else:
         if type(MESSAGE["action"]) != str:
             xml_object = "<data>" \
                      "" + "<success>" + str(return_object["success"]) + "</success>" + \
-                     "" + "<action>" + MESSAGE["action"]["type"] or MESSAGE["action"] + "</action>" + \
+                     "" + "<action>" + MESSAGE["action"]["type"]  + "</action>" + \
                          "</data>"
         else:
 
             xml_object = "<data>" \
                      "" + "<success>" + str(return_object["success"]) + "</success>" + \
-                     "" + "<action>" + MESSAGE["action"] or MESSAGE["action"] + "</action>" + \
+                     "" + "<action>" + MESSAGE["action"]  + "</action>" + \
                                                                     "</data>"
     return xml_object
 
