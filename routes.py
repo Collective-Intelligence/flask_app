@@ -81,3 +81,17 @@ def add_post():
     xml_res = add_post_curation.delay(username, password, tag, post_link).wait()
 
     return Response(xml_res, mimetype='text/xml')
+
+
+
+@flask_app.route('/vote_post', methods=['POST'])
+def vote_post():
+    password = request.form.getlist("password")[0]
+    username = request.form.getlist("username")[0]
+    tag = request.form.getlist("tag")[0]
+    post_link = request.form.getlist("post-link")[0]
+    vote = int(request.form.getlist("vote")[0])
+
+    xml_res = vote_post_curation.delay(username, password, tag, vote,post_link).wait()
+
+    return Response(xml_res, mimetype='text/xml')

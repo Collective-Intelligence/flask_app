@@ -155,6 +155,8 @@ def send_json_curation(MESSAGE):
     except Exception as e:
         print(e)
         pass
+    print(return_object)
+
     MESSAGE = json.loads(og)
     return_object = json.loads(return_object)
 
@@ -163,37 +165,54 @@ def send_json_curation(MESSAGE):
         return_object["error"]
     except:
         has_error = False
+
+
+    possible_info = ["post"]
+    info = ""
+    for i in possible_info:
+        try:
+            print(i)
+            return_object[i]
+            print(return_object[i])
+            if i == "post":
+                print("here")
+                info = "<info>" +return_object[i][0] + "</info>"
+                print(return_object[i][0])
+                break
+        except Exception as e:
+            print(e)
+            pass
+
     if has_error:
         if type(MESSAGE["action"]) != str:
 
             xml_object = "<data>" \
                          "" + "<success>" + str(return_object["success"]) + "</success>" + \
                          "" + "<error>" + str(return_object["error"]) + "</error>" \
-                         "" + "<action>" + MESSAGE["action"]["type"] + "</action>" + \
+                         "" + "<action>" + MESSAGE["action"]["type"] + "</action>" + info \
                          +"</data>"
         else:
 
             xml_object = "<data>" \
                          "" + "<success>" + str(return_object["success"]) + "</success>" + \
                          "" + "<error>" + str(return_object["error"]) + "</error>" \
-                           "" + "<action>" + MESSAGE["action"] + "</action>" \
+                           "" + "<action>" + MESSAGE["action"] + "</action>"  + info\
                                          +"</data>"
 
     else:
         if type(MESSAGE["action"]) != str:
             xml_object = "<data>" \
                          "" + "<success>" + str(return_object["success"]) + "</success>" + \
-                         "" + "<action>" + MESSAGE["action"]["type"]  + "</action>" + \
+                         "" + "<action>" + MESSAGE["action"]["type"]  + "</action>"  + info+ \
                                                                         "</data>"
         else:
 
             xml_object = "<data>" \
                          "" + "<success>" + str(return_object["success"]) + "</success>" + \
-                         "" + "<action>" +MESSAGE["action"] + "</action>" + \
+                         "" + "<action>" +MESSAGE["action"] + "</action>" + info+\
                                                                 "</data>"
     return xml_object
 
-    return xml_object
 
 def send_json_account(MESSAGE):
     og = MESSAGE
@@ -249,40 +268,53 @@ def send_json_account(MESSAGE):
         pass
     MESSAGE = json.loads(og)
     return_object = json.loads(return_object)
-    print(return_object)
+
     has_error = True
     try:
         return_object["error"]
     except:
         has_error = False
+
+    possible_info = []
+    info = ""
+    for i in possible_info:
+        try:
+            return_object[i]
+
+            break
+        except:
+            pass
+
     if has_error:
         if type(MESSAGE["action"]) != str:
 
             xml_object = "<data>" \
-                     ""+"<success>" +str(return_object["success"])+ "</success>"+ \
-                     "" + "<error>" + str(return_object["error"]) + "</error>" \
-                    "" +"<action>"+ MESSAGE["action"]["type"]+"</action>"+\
-                    "</data>"
+                         "" + "<success>" + str(return_object["success"]) + "</success>" + \
+                         "" + "<error>" + str(return_object["error"]) + "</error>" \
+                                                                        "" + "<action>" + MESSAGE["action"][
+                             "type"] + "</action>" + info \
+                         + "</data>"
         else:
 
             xml_object = "<data>" \
-                     ""+"<success>" +str(return_object["success"])+ "</success>"+ \
-                     "" + "<error>" + str(return_object["error"]) + "</error>" \
-                    "" +"<action>"+ MESSAGE["action"] + "</action>"\
-                   + "</data>"
+                         "" + "<success>" + str(return_object["success"]) + "</success>" + \
+                         "" + "<error>" + str(return_object["error"]) + "</error>" \
+                                                                        "" + "<action>" + MESSAGE[
+                             "action"] + "</action>" + info \
+                         + "</data>"
 
     else:
         if type(MESSAGE["action"]) != str:
             xml_object = "<data>" \
-                     "" + "<success>" + str(return_object["success"]) + "</success>" + \
-                     "" + "<action>" + MESSAGE["action"]["type"]  + "</action>" + \
+                         "" + "<success>" + str(return_object["success"]) + "</success>" + \
+                         "" + "<action>" + MESSAGE["action"]["type"] + "</action>" + info + \
                          "</data>"
         else:
 
             xml_object = "<data>" \
-                     "" + "<success>" + str(return_object["success"]) + "</success>" + \
-                     "" + "<action>" + MESSAGE["action"]  + "</action>" + \
-                                                                    "</data>"
+                         "" + "<success>" + str(return_object["success"]) + "</success>" + \
+                         "" + "<action>" + MESSAGE["action"] + "</action>" + info + "</data>"
+
     return xml_object
 
 
