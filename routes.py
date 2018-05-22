@@ -95,3 +95,25 @@ def vote_post():
     xml_res = vote_post_curation.delay(username, password, tag, vote,post_link).wait()
 
     return Response(xml_res, mimetype='text/xml')
+
+
+@flask_app.route('/get_session_list', methods=['POST'])
+def vote_post():
+    password = request.form.getlist("password")[0]
+    username = request.form.getlist("username")[0]
+
+
+    xml_res = get_session_list.delay(username, password).wait()
+
+    return Response(xml_res, mimetype='text/xml')
+
+
+@flask_app.route('/buy_token', methods=['POST'])
+def vote_post():
+    password = request.form.getlist("password")[0]
+    username = request.form.getlist("username")[0]
+    token = request.form.getlist("token")[0]
+    amount = int(request.form.getlist("amount")[0])
+    xml_res = buy_token.delay(token,amount,username, password).wait()
+
+    return Response(xml_res, mimetype='text/xml')
