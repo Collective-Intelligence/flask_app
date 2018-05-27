@@ -60,7 +60,7 @@ celery = make_celery(flask_app)
 def login_celery(user_name,posting_key):
     print("here")
     # creates json to send to communication backend to create a session for the user, on login
-    json_object = json.dumps({"action":"create_session", "key":posting_key,"steem-name":user_name})
+    json_object = json.dumps({"action":"create_session", "key":posting_key,"steem-name":user_name, "system":"user","forward":"true"})
     return_info = send_json_account(json_object)
     return return_info
 
@@ -69,25 +69,25 @@ def login_celery(user_name,posting_key):
 
 @celery.task
 def buy_token(token,amount,user,key):
-    json_object = json.dumps({"action":{"type":"account","action_type":"make_purchase","amount": amount,"token_type": token,"use-steem":"False"},"key":key,"steem-name":user})
+    json_object = json.dumps({"action":{"type":"account","action_type":"make_purchase","amount": amount,"token_type": token,"use-steem":"False"},"key":key,"steem-name":user, "system":"user", "forward":"true"})
     return send_json_account(json_object)
 
 
 @celery.task
 def create_curation_session(user,key,tag):
-    json_object = json.dumps({"action":{"type":"create_session", "tag":tag},"key":key,"steem-name":user})
+    json_object = json.dumps({"action":{"type":"create_session_curation", "tag":tag},"key":key,"steem-name":user, "forward":"false", "system":"curation"})
     return send_json_curation(json_object)
 
 @celery.task
 def get_session_list(user,key):
     json_object = json.dumps(
-        {"action": {"type": "session"}, "key": key, "steem-name": user})
+        {"action": {"type": "session"}, "key": key, "steem-name": user,"forward":"false","system":"curation"})
     return send_json_curation(json_object)
 
 @celery.task
 def add_post_curation(user,key,tag,post_link):
     json_object = json.dumps(
-        {"action": {"type": "add_post", "tag": tag,"post-link":post_link}, "key": key, "steem-name": user})
+        {"action": {"type": "add_post", "tag": tag,"post-link":post_link}, "key": key, "steem-name": user, "forward":"true","system":"curation"})
     return send_json_curation(json_object)
 
 
@@ -95,27 +95,28 @@ def add_post_curation(user,key,tag,post_link):
 @celery.task
 def get_post_curation(user,key,tag):
     json_object = json.dumps(
-        {"action": {"type": "get_post", "tag": tag}, "key": key, "steem-name": user})
+        {"action": {"type": "get_post", "tag": tag}, "key": key, "steem-name": user, "forward":"true","system":"curation"})
     return send_json_curation(json_object)
 
 @celery.task
 def vote_post_curation(user,key,tag,vote,post_link):
     json_object = json.dumps(
-        {"action": {"type": "add_vote", "tag": tag,"vote":[user,vote],"post":post_link}, "key": key, "steem-name": user})
+        {"action": {"type": "add_vote", "tag": tag,"vote":[user,vote],"post":post_link}, "key": key, "steem-name": user, "forward":"true","system":"curation"})
     return send_json_curation(json_object)
 
 
 def send_json_curation(MESSAGE):
     og = MESSAGE
     time_out = 300
-    global TCP_PORT, TCP_IP, BUFFER_SIZE
+    global  TCP_IP, BUFFER_SIZE
+    TCP_PORT = 5001
 
     return_object = False
     print(2)
     try:
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((TCP_IP, TCP_PORT+1))
+        s.connect((TCP_IP, TCP_PORT))
         s.send(MESSAGE.encode())
         data = ""
         print(3)
@@ -138,7 +139,7 @@ def send_json_curation(MESSAGE):
             time.sleep(1)
             MESSAGE = json.dumps({"action": "return_json", "idnum": id})
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((TCP_IP, TCP_PORT+1))
+            s.connect((TCP_IP, TCP_PORT))
             s.send(MESSAGE.encode())
             while True:
                 new_data = s.recv(BUFFER_SIZE)
@@ -156,10 +157,11 @@ def send_json_curation(MESSAGE):
         print(e)
         pass
     print(return_object)
-
-    MESSAGE = json.loads(og)
-    return_object = json.loads(return_object)
-
+    try:
+        MESSAGE = json.loads(og)
+        return_object = json.loads(return_object)
+    except:
+        pass
     has_error = True
     try:
         return_object["error"]
@@ -167,7 +169,7 @@ def send_json_curation(MESSAGE):
         has_error = False
 
 
-    possible_info = ["post"]
+    possible_info = ["post","tag_list"]
     info = ""
     for i in possible_info:
         try:
@@ -179,6 +181,8 @@ def send_json_curation(MESSAGE):
                 info = "<info>" +return_object[i][0] + "</info>"
                 print(return_object[i][0])
                 break
+            if i == "tag_list":
+                info = "<info>" +json.dumps(return_object[i][0]) + "</info>"
         except Exception as e:
             print(e)
             pass
@@ -266,9 +270,15 @@ def send_json_account(MESSAGE):
     except Exception as e:
         print(e)
         pass
-    MESSAGE = json.loads(og)
-    return_object = json.loads(return_object)
-
+    try:
+        MESSAGE = json.loads(og)
+    except:
+        pass
+    try:
+        print(return_object, type(return_object))
+        return_object = json.loads(return_object)
+    except:
+        pass
     has_error = True
     try:
         return_object["error"]

@@ -98,7 +98,7 @@ def vote_post():
 
 
 @flask_app.route('/get_session_list', methods=['POST'])
-def vote_post():
+def get_session_lists():
     password = request.form.getlist("password")[0]
     username = request.form.getlist("username")[0]
 
@@ -109,7 +109,7 @@ def vote_post():
 
 
 @flask_app.route('/buy_token', methods=['POST'])
-def vote_post():
+def buy_tokens():
     password = request.form.getlist("password")[0]
     username = request.form.getlist("username")[0]
     token = request.form.getlist("token")[0]
