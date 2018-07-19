@@ -1,0 +1,36 @@
+<div class="dropdown">
+    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Add
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+            <a class="test" tabindex="-1" href="#">Type1 <span class="caret"></span></a>
+            <ul class="dropdown-menu" id= "addtype1">
+            </ul>
+        </li>
+        <li class="dropdown-submenu">
+            <a class="test" tabindex="-1" href="#">Type2 <span class="caret"></span></a>
+            <ul class="dropdown-menu" id="addtype2">
+            </ul>
+        </li>
+        <li class="dropdown-submenu">
+            <a class="test" tabindex="-1" href="#">Type3 <span class="caret"></span></a>
+            <ul class="dropdown-menu" id="addtype3">
+            </ul>
+        </li>
+        <li class="dropdown-submenu">
+            <a class="test" tabindex="-1" href="#">Type4 <span class="caret"></span></a>
+            <ul class="dropdown-menu" id="addtype4">
+            </ul>
+        </li>
+    </ul>
+</div>
+<script>
+$(document).ready(function(){
+    $('.dropdown-submenu a.test').on("click", function(e){
+        $(this).next('ul').toggle();
+        e.stopPropagation();
+        e.preventDefault();
+    });
+});
+</script>

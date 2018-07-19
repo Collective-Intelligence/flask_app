@@ -4,6 +4,7 @@ import socket
 from celery import Celery
 import json
 import time
+from flask_cors import CORS
 
 
 repo_dir = "/home/cuck/Desktop/Projects/flask_app/templates"
@@ -17,7 +18,6 @@ import os
 
 
 
-from git import Repo
 
 #Repo.clone_from(git_url, repo_dir)
 
@@ -25,6 +25,7 @@ from git import Repo
 
 flask_app = Flask(__name__)
 flask_app.config.from_object(Config)
+CORS(flask_app)
 
 
 
@@ -79,13 +80,15 @@ def create_curation_session(user,key,tag):
     return send_json_curation(json_object)
 
 @celery.task
-def get_session_list(user,key):
+def get_session_list():
+    print("GETTING LIST")
     json_object = json.dumps(
-        {"action": {"type": "session"}, "key": key, "steem-name": user,"forward":"false","system":"curation"})
+        {"action": {"type": "session"}, "key": "", "steem-name": "","forward":"false","system":"curation"})
     return send_json_curation(json_object)
 
 @celery.task
-def add_post_curation(user,key,tag,post_link):
+def add_post_curation_celery(user,key,tag,post_link):
+
     json_object = json.dumps(
         {"action": {"type": "add_post", "tag": tag,"post-link":post_link}, "key": key, "steem-name": user, "forward":"true","system":"curation"})
     return send_json_curation(json_object)
@@ -107,7 +110,7 @@ def vote_post_curation(user,key,tag,vote,post_link):
 
 def send_json_curation(MESSAGE):
     og = MESSAGE
-    time_out = 300
+    time_out = 90
     global  TCP_IP, BUFFER_SIZE
     TCP_PORT = 5001
 
@@ -132,6 +135,7 @@ def send_json_curation(MESSAGE):
         times = 0
         # waits until the task is done by the communication backend
         while not return_object or return_object == "404":
+            print("Finding thing")
             data = ""
             times += 1
             if times > time_out:
@@ -183,9 +187,11 @@ def send_json_curation(MESSAGE):
                 break
             if i == "tag_list":
                 info = "<info>" +json.dumps(return_object[i][0]) + "</info>"
+
         except Exception as e:
             print(e)
             pass
+    return return_object
 
     if has_error:
         if type(MESSAGE["action"]) != str:

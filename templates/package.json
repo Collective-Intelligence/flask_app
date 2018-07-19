@@ -1,0 +1,30 @@
+{
+  "name": "CollectiveIntelligence",
+  "version": "0.1.0",
+  "description": "Collective Intelligence",
+  "contributors": [],
+  "main": "app.js",
+  "scripts": {
+    "start": "app.js"
+  },
+  "dependencies": {
+    "express": "^4.16.2"
+  },
+  "bugs": {
+    "url": "https://github.com/anarchyhasnogods/website_start/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anarchyhasnogods/website_start"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-autoprefixer": "^3.0.4",
+    "grunt-contrib-cssmin": "^1.0.2",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-contrib-pug": "^1.0.0",
+    "grunt-sass": "^2.0.0"
+  }
+}

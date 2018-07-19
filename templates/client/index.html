@@ -1,0 +1,30 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><title>Collective Intelligence</title><link rel="stylesheet" href="assets/style/main.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons|Noto+Sans"><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width"><script src="scripts/handlebars.js"></script><script src="scripts/page.js"></script><!--script#template__account(type="text/x-handlebars-template"): include ../templates/account.hbs--><!--script#template__curation(type="text/x-handlebars-template"): include ../templates/curation.hbs--><!--script#template__delegation(type="text/x-handlebars-template"): include ../templates/delegation.hbs--><!--script#template__dropdown(type="text/x-handlebars-template"): include ../templates/dropdown.hbs--><!--script#template__dropdown2(type="text/x-handlebars-template"): include ../templates/dropdown2.hbs--><script id="template__sidebar" type="text/x-handlebars-template">{{#each sections}}
+	{{#if name}}
+		{{#if url}}<a href="{{url}}" title="{{tooltip}}" nocard>{{/if}}<div class="side__title"><b>{{name}}</b></div>{{#if url}}</a>{{/if}}
+	{{/if}}
+	{{#each links}}
+		{{#if tabled}}
+			<a href="{{url}}" nocard><div class="side__link {{#if active}}side-select{{/if}}">
+				<table>
+					<tr>
+						<td style="width:100%;">{{name}}</td>
+						<td>{{value}}</td>
+					</tr>
+				</table>
+			</div></a>
+		{{else}}
+			<a href="{{url}}" nocard><div class="side__link {{#if active}}side__select{{/if}}">{{name}}</div></a>
+		{{/if}}
+	{{/each}}
+{{/each}}
+</script><!--script#template__tokens(type="text/x-handlebars-template"): include ../templates/tokens.hbs--><script id="template__test" type="text/x-handlebars-template"><div
+    class="card module"
+    id="module-{{id}}"
+    onmousedown="_ci.ui.moduleDrag.mouseDown(event)"
+    moduleid="{{id}}"
+>
+    <div class="module__content">
+        <p>{{name}}</p>
+    </div>
+</div>
+</script><script src="scripts/client.js"></script></head><body> <div class="menu nav"><div class="button search has-responder"><div class="responder search__responder"></div><form action="javascript:page('/search/' + encodeURIComponent(_c('search__input')[0].value))"><input class="search__input" type="text" placeholder="Search"><input class="search__submit material-icons" type="submit" value="search"></form></div><div class="nav__option material-icons" id="nav__dark" onclick="_ci.t.toggleDarkMode()">brightness_2</div><div class="nav__option material-icons" id="nav__edit" onclick="_ci.ui.edit()">build</div></div><div class="side"><div class="drawer side__bar"><div class="side__content"></div></div></div><div id="mContainer"></div></body></html>

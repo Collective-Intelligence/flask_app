@@ -1,0 +1,132 @@
+
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><title>Collective Intelligence</title>
+ <script src="//cdn.steemjs.com/lib/latest/steem.min.js"></script>
+
+
+
+
+		<script>
+		// TEST 1 LOG IN
+		console.log("START with thing")
+
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", '/login', false);
+
+		//Send the proper header information along with the request
+		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+		xhr.onreadystatechange = function() {//Call a function when the state changes.
+		    if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+		        alert(xhr.responseText);
+		    }
+		}
+		var num = 9
+		xhr.send("username=anarchyhasnogods&password=5KQg9ZiMdNWpiBrrUdhdhmsox4d4BkwPBd1A8RjMXixzFsASBtu");
+
+		</script>
+		<script>
+		//  CREATE CURATION SESSION
+		console.log("START with thing")
+
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", '/create_curation', false);
+
+		//Send the proper header information along with the request
+		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+		xhr.onreadystatechange = function() {//Call a function when the state changes.
+		    if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+		        alert(xhr.responseText);
+		    }
+		}
+		var num = 9
+		xhr.send("username=anarchyhasnogods&password=5KQg9ZiMdNWpiBrrUdhdhmsox4d4BkwPBd1A8RjMXixzFsASBtu&tag=TAG");
+
+		</script>
+
+
+		<script>
+		//  ADD_POST
+		console.log("START with thing")
+
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", '/add_post', false);
+
+		//Send the proper header information along with the request
+		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+		xhr.onreadystatechange = function() {//Call a function when the state changes.
+		    if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+		        alert(xhr.responseText);
+		    }
+		}
+		var num = 9
+		xhr.send("username=anarchyhasnogods&password=5KQg9ZiMdNWpiBrrUdhdhmsox4d4BkwPBd1A8RjMXixzFsASBtu&tag=TAG&post-link=https://steemit.com/news/@dirge/sante-fe-shooting-another-entitled-male-loser");
+
+		</script>
+
+
+
+
+				<script>
+				//  GET POST
+				console.log("START with thing")
+
+				var xhr = new XMLHttpRequest();
+				xhr.open("POST", '/get_post', false);
+
+				//Send the proper header information along with the request
+				xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+				xhr.onreadystatechange = function() {//Call a function when the state changes.
+				    if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+				        alert(xhr.responseText);
+				    }
+				}
+				var num = 9
+				xhr.send("username=anarchyhasnogods&password=5KQg9ZiMdNWpiBrrUdhdhmsox4d4BkwPBd1A8RjMXixzFsASBtu&tag=TAG&post-link=https://steemit.com/news/@dirge/sante-fe-shooting-another-entitled-male-loser");
+
+				</script>
+
+
+				<script>
+				//  GET POST
+				console.log("START with thing")
+
+				var xhr = new XMLHttpRequest();
+				xhr.open("POST", '/get_post', false);
+
+				//Send the proper header information along with the request
+				xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+				xhr.onreadystatechange = function() {//Call a function when the state changes.
+						if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+								alert(xhr.responseText);
+						}
+				}
+				var num = 9
+				xhr.send("username=anarchyhasnogods&password=5KQg9ZiMdNWpiBrrUdhdhmsox4d4BkwPBd1A8RjMXixzFsASBtu&tag=TAG&post-link=https://steemit.com/news/@dirge/sante-fe-shooting-another-entitled-male-loser");
+
+				</script>
+
+				<script>
+				//  VOTE POST
+				console.log("START with thing2")
+
+				var xhr = new XMLHttpRequest();
+				xhr.open("POST", '/vote_post', false);
+
+				//Send the proper header information along with the request
+				xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+				xhr.onreadystatechange = function() {//Call a function when the state changes.
+						if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+								alert(xhr.responseText);
+						}
+				}
+				var num = 9
+				xhr.send("username=anarchyhasnogods&password=5KQg9ZiMdNWpiBrrUdhdhmsox4d4BkwPBd1A8RjMXixzFsASBtu&tag=TAG&post-link=https://steemit.com/news/@dirge/sante-fe-shooting-another-entitled-male-loser&vote=1");
+
+				</script>
+</div>
+		</html>

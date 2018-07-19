@@ -1,0 +1,33 @@
+doctype html
+html(xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en")
+    head
+        title Collective Intelligence
+        link(rel="stylesheet" href="assets/style/main.css")
+        link(rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons|Noto+Sans")
+        meta(charset="utf-8")
+        meta(http-equiv="X-UA-Compatible" content="IE=edge")
+        meta(name="viewport" content="width=device-width")
+        script(src="scripts/handlebars.js")
+        script(src="scripts/page.js")
+        //script#template__account(type="text/x-handlebars-template"): include ../templates/account.hbs
+        //script#template__curation(type="text/x-handlebars-template"): include ../templates/curation.hbs
+        //script#template__delegation(type="text/x-handlebars-template"): include ../templates/delegation.hbs
+        //script#template__dropdown(type="text/x-handlebars-template"): include ../templates/dropdown.hbs
+        //script#template__dropdown2(type="text/x-handlebars-template"): include ../templates/dropdown2.hbs
+        script#template__sidebar(type="text/x-handlebars-template"): include ../templates/sidebar.hbs
+        //script#template__tokens(type="text/x-handlebars-template"): include ../templates/tokens.hbs
+        script#template__test(type="text/x-handlebars-template"): include ../templates/test.hbs    
+        script(src="scripts/client.js")
+    body 
+        div.menu.nav
+            div.button.search.has-responder
+                div.responder.search__responder
+                form(action="javascript:page('/search/' + encodeURIComponent(_c('search__input')[0].value))")
+                    input.search__input(type="text" placeholder="Search")
+                    input.search__submit.material-icons(type="submit" value="search")
+            div#nav__dark.nav__option.material-icons(onclick="_ci.t.toggleDarkMode()") brightness_2
+            div#nav__edit.nav__option.material-icons(onclick="_ci.ui.edit()") build
+        div.side
+            div.drawer.side__bar
+                div.side__content
+        div#mContainer

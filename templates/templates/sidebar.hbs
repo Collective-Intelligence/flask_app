@@ -1,0 +1,19 @@
+{{#each sections}}
+	{{#if name}}
+		{{#if url}}<a href="{{url}}" title="{{tooltip}}" nocard>{{/if}}<div class="side__title"><b>{{name}}</b></div>{{#if url}}</a>{{/if}}
+	{{/if}}
+	{{#each links}}
+		{{#if tabled}}
+			<a href="{{url}}" nocard><div class="side__link {{#if active}}side-select{{/if}}">
+				<table>
+					<tr>
+						<td style="width:100%;">{{name}}</td>
+						<td>{{value}}</td>
+					</tr>
+				</table>
+			</div></a>
+		{{else}}
+			<a href="{{url}}" nocard><div class="side__link {{#if active}}side__select{{/if}}">{{name}}</div></a>
+		{{/if}}
+	{{/each}}
+{{/each}}

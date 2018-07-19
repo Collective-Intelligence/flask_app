@@ -1,0 +1,396 @@
+/**
+ *  Main client stylesheet
+ *  @author Una Ada (Trewbot) <una@phene.co>
+ *
+ *  Naming conventions are based loosely on BEM (http://getbem.com/naming/) but
+ *  extended to more accurately represent material design ideas. Rather than
+ *  blocks, this uses Model and Implementation. A model is essentially a type
+ *  of block whereas an Implementation is a use of it, this allows for more
+ *  generalization of block names, .post would here be .card.post so that styles
+ *  of .card are not repeated in something like .card.note
+ */
+
+//	Colors
+$amber:			#FFC107;
+$blue-grey:		#607D8B;
+$brown-300:		#A1887F;
+$deep-orange:	#FF5722;
+$grey:			#9E9E9E;
+$light-green:	#8BC34A;
+$pink:			#E91E63;
+$red:			#F44336;
+
+//	Shadows (based on AngularJS Whiteframe)
+$shadow-1dp:
+	0 1px 3px 0 rgba(0,0,0,.2),
+	0 1px 1px 0 rgba(0,0,0,.14),
+	0 2px 1px -1px rgba(0,0,0,.12);
+$shadow-2dp:
+	0 1px 5px 0 rgba(0,0,0,.2),
+	0 2px 2px 0 rgba(0,0,0,.14),
+	0 3px 1px -2px rgba(0,0,0,.12);
+$shadow-3dp:
+	0 1px 8px 0 rgba(0,0,0,.2),
+	0 3px 4px 0 rgba(0,0,0,.14),
+	0 3px 3px -2px rgba(0,0,0,.12);
+$shadow-4dp:
+	0 2px 4px -1px rgba(0,0,0,.2),
+	0 4px 5px 0 rgba(0,0,0,.14),
+	0 1px 10px 0 rgba(0,0,0,.12);
+$shadow-5dp:
+	0 3px 5px -1px rgba(0,0,0,.2),
+	0 5px 8px 0 rgba(0,0,0,.14),
+	0 1px 14px 0 rgba(0,0,0,.12);
+$shadow-6dp:
+	0 3px 5px -1px rgba(0,0,0,.2),
+	0 6px 10px 0 rgba(0,0,0,.14),
+	0 1px 18px 0 rgba(0,0,0,.12);
+$shadow-7dp:
+	0 4px 5px -2px rgba(0,0,0,.2),
+	0 7px 10px 1px rgba(0,0,0,.14),
+	0 2px 16px 1px rgba(0,0,0,.12);
+$shadow-8dp:
+	0 5px 5px -3px rgba(0,0,0,.2),
+	0 8px 10px 1px rgba(0,0,0,.14),
+	0 3px 14px 2px rgba(0,0,0,.12);
+$shadow-9dp:
+	0 5px 6px -3px rgba(0,0,0,.2),
+	0 9px 12px 1px rgba(0,0,0,.14),
+	0 3px 16px 2px rgba(0,0,0,.12);
+$shadow-10dp:
+	0 6px 6px -3px rgba(0,0,0,.2),
+	0 10px 14px 1px rgba(0,0,0,.14),
+	0 4px 18px 3px rgba(0,0,0,.12);
+$shadow-11dp:
+	0 6px 6px -3px rgba(0,0,0,.2),
+	0 10px 14px 1px rgba(0,0,0,.14),
+	0 4px 18px 3px rgba(0,0,0,.12);
+$shadow-12dp:
+	0 7px 8px -4px rgba(0,0,0,.2),
+	0 12px 17px 2px rgba(0,0,0,.14),
+	0 5px 22px 4px rgba(0,0,0,.12);
+$shadow-13dp:
+	0 7px 8px -4px rgba(0,0,0,.2),
+	0 12px 17px 2px rgba(0,0,0,.14),
+	0 5px 22px 4px rgba(0,0,0,.12);
+$shadow-14dp:
+	0 7px 9px -4px rgba(0,0,0,.2),
+	0 14px 21px 2px rgba(0,0,0,.14),
+	0 5px 26px 4px rgba(0,0,0,.12);
+$shadow-15dp:
+	0 8px 9px -5px rgba(0,0,0,.2),
+	0 15px 22px 2px rgba(0,0,0,.14),
+	0 6px 28px 5px rgba(0,0,0,.12);
+$shadow-16dp:
+	0 8px 10px -5px rgba(0,0,0,.2),
+	0 16px 24px 2px rgba(0,0,0,.14),
+	0 6px 30px 5px rgba(0,0,0,.12);
+$shadow-17dp:
+	0 8px 11px -5px rgba(0,0,0,.2),
+	0 17px 26px 2px rgba(0,0,0,.14),
+	0 6px 32px 5px rgba(0,0,0,.12);
+$shadow-18dp:
+	0 9px 11px -5px rgba(0,0,0,.2),
+	0 18px 28px 2px rgba(0,0,0,.14),
+	0 7px 34px 6px rgba(0,0,0,.12);
+$shadow-19dp:
+	0 9px 12px -6px rgba(0,0,0,.2),
+	0 19px 29px 2px rgba(0,0,0,.14),
+	0 7px 36px 6px rgba(0,0,0,.12);
+$shadow-20dp:
+	0 10px 13px -6px rgba(0,0,0,.2),
+	0 20px 31px 3px rgba(0,0,0,.14),
+	0 8px 38px 7px rgba(0,0,0,.12);
+$shadow-21dp:
+	0 10px 13px -6px rgba(0,0,0,.2),
+	0 20px 31px 3px rgba(0,0,0,.14),
+	0 8px 38px 7px rgba(0,0,0,.12);
+$shadow-22dp:
+	0 10px 14px -6px rgba(0,0,0,.2),
+	0 22px 35px 3px rgba(0,0,0,.14),
+	0 8px 42px 7px rgba(0,0,0,.12);
+$shadow-23dp:
+	0 11px 14px -7px rgba(0,0,0,.2),
+	0 23px 36px 3px rgba(0,0,0,.14),
+	0 9px 44px 8px rgba(0,0,0,.12);
+$shadow-24dp:
+	0 11px 15px -7px rgba(0,0,0,.2),
+	0 24px 38px 3px rgba(0,0,0,.14),
+	0 9px 46px 8px rgba(0,0,0,.12);
+
+//	Mixins
+@mixin font-size($size: 1.6){
+	font-size:($size * 10) + px;
+	font-size:$size + rem;
+}
+
+//	Generics
+* {
+	margin:0;
+	zoom:1;
+}
+body {
+	@include font-size(1.2);
+	&.is-dragging {
+		user-select: none;
+		#mContainer {
+			.card:not(.is-dragging) {
+				transition: top 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);
+			}
+		}
+	}
+}
+html {
+	background: #f8f8f8 url("../img/back.png");
+	background-attachment: fixed;
+	color: #111;
+	font-family: 'Noto Sans',sans-serif;
+	font-size: 10px;
+	&.is-dark {
+		background: #303030 url("../img/back_dark.png");
+		.card,
+		.search,
+		.side__bar {
+			background: #444 !important;
+			color: #fff;
+		}
+		.nav {
+			background: #333 !important;
+		}
+		.responder {
+			background: #888 !important;
+		}
+		.search__submit {
+			color: #444 !important;
+		}
+	}
+}
+
+//	Page Layout
+#body {
+	padding-top:8rem;
+	position:absolute;
+}
+.column {
+	min-height:1px;
+	position:absolute;
+}
+.mFrame {
+	margin-bottom: 2rem;
+	position: relative;
+	&.is-empty {
+		// background: rgba(100,100,100,0.3);
+	}
+}
+
+//	Models (ordered by height)
+.icon {
+	color:#ccc;
+	cursor:pointer;
+	font-size:16px !important;
+}
+.responder {
+	background:#ddd;
+	height:100%;
+	left:0;
+	opacity:0;
+	position:absolute;
+	top:0;
+	width:100%;
+}
+.button {
+	z-index:200;
+	box-shadow:$shadow-2dp;
+	transition:box-shadow 0.3s cubic-bezier(.25,.8,.25,1);
+	&.is-lifted {
+		z-index:800;
+		box-shadow:$shadow-8dp;
+	}
+	&.is-secondary {
+		background:#757575 !important;
+	}
+}
+.card {
+	z-index: 200;
+	box-shadow: $shadow-2dp;
+	width: 100%;
+	display: inline-block;
+	background: #fff;
+	// margin-bottom: 2rem;
+	transition: box-shadow 0.3s cubic-bezier(.25,.8,.25,1),
+				width 0.2s cubic-bezier(.25,.8,.25,1);
+	&.is-lifted {
+		z-index: 800;
+		box-shadow: $shadow-8dp;
+	}
+	&.is-dragging {
+		position: fixed;
+		user-select: none;
+	}
+}
+.menu {
+	z-index:800;
+	box-shadow:$shadow-8dp;
+}
+.flag {
+	z-index:1500;
+	background:$red;
+	box-shadow:$shadow-15dp;
+	color:#fff;
+	left:0;
+	padding:4px;
+	position:fixed;
+	text-align:center;
+	top:0;
+	width:calc(100% - 8px);
+}
+.flag a {
+	color:#fff !important;
+	font-weight:bold;
+}
+.drawer {
+	z-index:1600;
+	box-shadow:$shadow-16dp;
+}
+.dialog {
+	z-index:2400;
+	box-shadow:$shadow-24dp;
+}
+
+//	Implementations
+#cedit {
+	height: 100%;
+	left: 0;
+	position: fixed;
+	top: 0;
+	z-index: 0;
+}
+.module {
+	position: absolute;
+	.module__content {
+		padding: 1rem;
+	}
+}
+.nav {
+	background: #f8f8f8;
+	height: 5rem;
+	left: 0;
+	position: fixed;
+	top: 0;
+	width: 100%;
+}
+.search {
+	background: #fff;
+	height: 3rem;
+	left: 30vw;
+	margin-top: 1rem;
+	min-width: 500px;
+	position: relative;
+	width: 40vw;
+	.search__input {
+		background: transparent;
+		border: 0;
+		height: 3rem;
+		left: 0;
+		line-height: 3rem;
+		outline: 0;
+		padding: 0 1rem;
+		position: absolute;
+		top: 0;
+		width: calc(100% - 7rem);
+	}
+	.search__submit {
+		border: 0;
+		color: #fff !important;
+		cursor: pointer;
+		font-size: 2rem !important;
+		height: 3rem;
+		line-height: 3rem;
+		outline: 0;
+		position: absolute;
+		right: 0;
+		text-align: center;
+		top: 0;
+		width: 5rem;
+	}
+}
+.side {
+	height:100%;
+	left:-220px;
+	position:fixed;
+	top:0;
+	transition-duration:0.3s;
+	transition-timing-function:cubic-bezier(0, 0.4, 0.2, 1.3);
+	z-index:1600;
+}
+
+//	Elements
+.cedit__ghost {
+	background: rgba(0,0,0,0.1);
+	height: 100%;
+	position: absolute;
+	z-index: 0;
+}
+.cedit__handle {
+	cursor: col-resize;
+	height: 100%;
+	position: absolute;
+	z-index: 100;
+}
+.nav__option {
+	cursor: pointer;
+	font-size: 2rem;
+	line-height: 3rem;
+	position: absolute;
+	top: 1rem;
+}
+#nav__dark {
+	right: 4rem;
+}
+#nav__edit {
+	right: 1rem;
+}
+.side__bar {
+	background:#fff;
+	border:0 !important;
+	height:calc(100px + 100%);
+	left:0;
+	padding:0;
+	position:absolute;
+	top:-100px;
+	width:230px;
+}
+.side__content {
+	left:20px;
+	padding:10px;
+	position:absolute;
+	top:210px;
+	width:calc(100% - 40px);
+}
+
+//	Dark Mode
+html.dark {
+	background: #333 url("../img/back_dark.png");
+	color: #fff;
+
+	//	Models
+	.responder {
+		background: #333;
+	}
+	.card {
+		background: #444;
+	}
+
+	//	Implementations
+	.nav {
+		background: #383838;
+	}
+	.search {
+		background: #444;
+	}
+
+	//	Elements
+	.side__bar {
+		background: #444;
+	}
+}

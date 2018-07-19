@@ -1,6 +1,10 @@
 {% extends "base.html" %}
-
 {% block content %}
+
+<p>{{ MESSAGE }}</p>
+
+
+
 <h1>Sign In</h1>
 
 <form action="" method="post">
@@ -18,9 +22,15 @@
     {% for error in form.password.errors %}
     <span style="color: red;">[{{ error }}]</span>
     {% endfor %}
+
+</p><p>
+
 </p>
-<p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+{{ form.action.label }}<br>
+{{ form.action() }}<br>
 <p>{{ form.submit() }}</p>
 
 </form>
+
+
 {% endblock %}
