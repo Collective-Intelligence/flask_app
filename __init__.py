@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_app.config import Config
+#from flask_app.config import Config
 import socket
 from celery import Celery
 import json
@@ -24,11 +24,14 @@ import os
 
 
 flask_app = Flask(__name__)
-flask_app.config.from_object(Config)
+#flask_app.config.from_object(Config)
 CORS(flask_app)
 
 
-
+flask_app.config.update(dict(
+    SECRET_KEY="sfffffffffffap;df kasfpo safpk poasik fpaosif 09asiu f09 iu12q90-4 i12-i92r[  90u q90W3R{",
+    WTF_CSRF_SECRET_KEY="qazwsxcfy*(  FYYFC89EVG N9I8OHGBVDESWIR89 GEDAW8SY79HWYQP9QR7FY8 RFY83R89R89IYH2W3RP9R "
+))
 
 
 
@@ -70,8 +73,8 @@ def login_celery(user_name,posting_key):
 
 @celery.task
 def buy_token(token,amount,user,key):
-    json_object = json.dumps({"action":{"type":"account","action_type":"make_purchase","amount": amount,"token_type": token,"use-steem":"False"},"key":key,"steem-name":user, "system":"user", "forward":"true"})
-    return send_json_account(json_object)
+    json_object = json.dumps({"action":{"type":"buy_token","amount": amount,"token_type": token,"use-steem":"False"},"key":key,"steem-name":user})
+    return send_json_curation(json_object)
 
 
 @celery.task
@@ -336,3 +339,5 @@ def send_json_account(MESSAGE):
 
 
 from flask_app import routes
+
+#flask_app.run(host="0.0.0.0")

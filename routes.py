@@ -1,4 +1,4 @@
-from flask_app import flask_app
+import flask_app
 from flask import render_template, flash, redirect, url_for, request
 from flask import Response
 from flask_app import forms
@@ -98,9 +98,14 @@ def add_post_curation(message_number):
 
 
         success = add_post_curation_celery.delay(username, password,tag,post_link).wait()
-        if success["success"]:
+
+        if success and success["success"]:
             return render_template("add_post.html", title="Curation",form=form, MESSAGE="Post submitted")
         else:
+            if success and success["error"] == 1002:
+                return render_template("add_post.html", title="Curation", form=form,
+                                       MESSAGE="Post did not submit, incorrect key or glitch in system.")
+
             return render_template("add_post.html", title="Curation",form=form, MESSAGE="Post did not submit, are you sure you have enough tokens?")
 
 
@@ -109,7 +114,7 @@ def add_post_curation(message_number):
     pass
 
 
-@flask_app.route('/curation', methods=["GET","POST"])
+@flask_app.route('/curation', methods=["GET", "POST"])
 def curation():
     with forms.get_post.locks["update"]:
         form = forms.get_post()
@@ -135,7 +140,7 @@ def curation():
                 new_url = ""
                 for i in post_url[0]:
                     if i =="/":
-                        new_url += "-"
+                        new_url += "|"
                     else:
                         new_url += i
                 return redirect("/vote_post/" + new_url + "/" + form.action.data)
@@ -165,7 +170,7 @@ def vote_post(post_name,tag):
     print("STARTING VOTE POST")
     new_post_name = ""
     for i in post_name:
-        if i == "-":
+        if i == "|":
             new_post_name += "/"
         else:
             new_post_name += i
@@ -179,10 +184,10 @@ def vote_post(post_name,tag):
         post_link = post_name
 
         worked = vote_post_curation.delay(username, password,tag, vote, post_link).wait()
-        if worked["success"] == False:
+        if not worked or worked["success"] == False:
             render_template("vote",title="Curation", form=form, MESSAGE = "VOTE ERROR, please try again: What do you think of: " + post_name)
         else:
-            redirect("/curation")
+            return redirect("/curation")
     return render_template("vote_post.html",title="Curation", form=form, MESSAGE = "What do you think of: " + post_name)
 
     pass

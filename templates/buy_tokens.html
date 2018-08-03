@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 
-<p>Get a post from a chosen curation system </p>
+<p>{{ MESSAGE }}</p>
+
 
 
 <h1>Sign In</h1>
@@ -21,14 +22,19 @@
     {% for error in form.password.errors %}
     <span style="color: red;">[{{ error }}]</span>
     {% endfor %}
+
+</p><p>
+    {{ form.post_link.label }}<br>
+    {{ form.post_link(size=128) }}<br>
+    {% for error in form.post_link.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
 </p>
 {{ form.action.label }}<br>
 {{ form.action() }}<br>
 <p>{{ form.submit() }}</p>
 
 </form>
-
-
 
 
 {% endblock %}

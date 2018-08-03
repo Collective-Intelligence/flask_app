@@ -1,11 +1,11 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField, form
 from wtforms.validators import DataRequired
-from flask_app import *
+#from flask_app import *
 import time
 import threading
 
-curation_systems = [("TAG","TAG")]
+curation_systems = [("general","general"), ("LGBT","LGBT")]
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = StringField('Password', validators=[DataRequired()])
@@ -40,7 +40,6 @@ class vote_post(FlaskForm):
         ('-1', 'Bad post'),
         ('0', 'Average post'),
         ('1', 'Good Post'),
-        ("get_post", 'Get Post'),
     ]
     username = StringField('Username', validators=[DataRequired()])
     password = StringField('Password', validators=[DataRequired()])
