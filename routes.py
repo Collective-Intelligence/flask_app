@@ -6,11 +6,26 @@ from flask_app import *
 import os, random
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField, form
 
+from flask import send_from_directory
 
 @flask_app.route('/', methods=['GET'])
 @flask_app.route('/index', methods=['GET'])
 def index():
     return render_template('index.html', title='Home')
+
+
+@flask_app.route('/main.css', methods=['GET'])
+def maincss():
+    return send_from_directory("static",
+                               "main.css")
+
+
+@flask_app.route('/logo.png', methods=['GET'])
+def logopng():
+    return send_from_directory("static",
+                               "logo.png")
+
+
 
 @flask_app.route('/login', methods=["GET",'POST'])
 def login():
@@ -26,7 +41,7 @@ def login():
 #    print("DATA", request.data)
 
     #print("FORM", request.form)
-    #print("DIR", dir(request.form))
+    #print("DIR", dir(request."titleform))
     #print("GETLIST", request.form.items())
     #print("LAST THING", request.form.getlist("password")[0])
         password = form.username.data
@@ -100,16 +115,16 @@ def add_post_curation(message_number):
         success = add_post_curation_celery.delay(username, password,tag,post_link).wait()
 
         if success and success["success"]:
-            return render_template("add_post.html", title="Curation",form=form, MESSAGE="Post submitted")
+            return render_template("add_post.html", title="Curation",form=form, MESSAGE="Post submitted",steps="../")
         else:
             if success and success["error"] == 1002:
                 return render_template("add_post.html", title="Curation", form=form,
                                        MESSAGE="Post did not submit, incorrect key or glitch in system.")
 
-            return render_template("add_post.html", title="Curation",form=form, MESSAGE="Post did not submit, are you sure you have enough tokens?")
+            return render_template("add_post.html", title="Curation",form=form, MESSAGE="Post did not submit, are you sure you have enough tokens?", steps="../")
 
 
-    return render_template("add_post.html",title="Curation", form=form, MESSAGE=message)
+    return render_template("add_post.html",title="Curation", form=form, MESSAGE=message, steps="../")
 
     pass
 
@@ -185,10 +200,10 @@ def vote_post(post_name,tag):
 
         worked = vote_post_curation.delay(username, password,tag, vote, post_link).wait()
         if not worked or worked["success"] == False:
-            render_template("vote",title="Curation", form=form, MESSAGE = "VOTE ERROR, please try again: What do you think of: " + post_name)
+            render_template("vote_post.html",title="Curation", form=form, MESSAGE = "VOTE ERROR, please try again: What do you think of: " + post_name, steps="../../")
         else:
             return redirect("/curation")
-    return render_template("vote_post.html",title="Curation", form=form, MESSAGE = "What do you think of: " + post_name)
+    return render_template("vote_post.html",title="Curation", form=form, MESSAGE = "What do you think of: " + post_name, steps="../../")
 
     pass
 

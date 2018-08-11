@@ -1,34 +1,99 @@
-
+<!DOCTYPE html>
 <html>
-    <head>
-        {% if title %}
-        <title>{{ title }} - microblog</title>
-        {% else %}
-        <title>microblog</title>
-        {% endif %}
-    </head>
-    <body>
-        <div>
-            Microblog:
-            <a href="/index">Home</a>
-            <a href="/curation">Curation</a>
-            <a href="add_post_curation/3">Submit post</a>
-            <a href="/shop">Shop</a>
-            <a href="/steem">Deposit</a>
 
-        </div>
-        <hr>
+	<head lang="en">
+		<meta charset="utf-8"/>
+		<title>Collective Intelligence</title>
 
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <ul>
-                {% for message in messages %}
-                <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-            {% endwith %}
 
-        {% block content %}{% endblock %}
-    </body>
+
+		{% if title %}
+		<title>{{ title }} - microblog</title>
+		{% else %}
+		<title>microblog</title>
+		{% endif %}
+		<link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+
+
+
+		{% if steps %}
+		<link rel="stylesheet" type="text/css" href="{{ steps }}main.css"/>
+		{% else %}
+		<link rel="stylesheet" type="text/css" href="main.css"/>
+		{% endif %}
+
+
+		<!--<link rel="shortcut icon" type="image/png" href="assets/favicon.png" />-->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+		<script>
+		function onLoad() {
+			setSelected();
+			$("div#wrapper").css('display', 'block');
+	}
+
+	function setSelected() {
+			path = document.location.pathname;
+			if (path == "/index" || path == "/ci/") {
+					$("a#homeButton").addClass("selected");
+			} else if (path == "/curation") {
+					$("a#curaButton").addClass("selected");
+			} else if (path == "/shop") {
+					$("a#shopButton").addClass("selected");
+			} else if (path == "/steem") {
+					$("a#depoButton").addClass("selected");
+			} else {
+					$("a#submButton").addClass("selected");
+			}
+			$("a.selected").attr("href", "");
+	}
+		</script>
+
+	</head>
+
+	<body onload="onLoad();">
+		<div id="wrapper">
+			<div id="left">
+				<div id="logo">
+					{% if steps %}
+					<img src="{{ steps }}logo.png" width="200px" />
+					{% else %}
+					<img src="logo.png" width="200px" />
+					{% endif %}
+				</div>
+				<div id="about">
+					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+				</div>
+			</div>
+			<div id="right">
+				<div id="header">
+					<a href="/index" id="homeButton">Home</a>
+					<a href="/curation" id="curaButton">Curation</a>
+					<a href="add_post_curation/3" id="submButton">Submit Post</a>
+					<a href="/shop" id="shopButton">Shop</a>
+					<a href="/steem" id="depoButton">Deposit</a>
+				</div>
+
+				<div id="content">
+					{% with messages = get_flashed_messages() %}
+							{% if messages %}
+							<ul>
+									{% for message in messages %}
+									<li>{{ message }}</li>
+									{% endfor %}
+							</ul>
+							{% endif %}
+							{% endwith %}
+
+
+							{% block content %}{% endblock %}
+
+			</div>
+			</div>
+		</div>
+		<script>
+    </script>
+	</body>
+
 </html>
