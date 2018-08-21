@@ -13,12 +13,31 @@ from flask import send_from_directory
 def index():
     return render_template('index.html', title='Home')
 
+@flask_app.route('/trending', methods=['GET'])
+def trending():
+    return render_template('trending.html', title='Home')
+
+@flask_app.route('/shop', methods=['GET'])
+def shop():
+    return render_template('shop.html', title='Shop', MESSAGE="")
+
+@flask_app.route('/steem', methods=['GET'])
+def dep():
+    return render_template('steem.html', title='Steem')
 
 @flask_app.route('/main.css', methods=['GET'])
 def maincss():
     return send_from_directory("static",
                                "main.css")
+@flask_app.route('/markdown.js', methods=['GET'])
+def markdown():
+    return send_from_directory("static",
+                               "markdown.js")
 
+@flask_app.route('/memos.js', methods=['GET'])
+def memos():
+    return send_from_directory("static",
+                               "memos.js")
 
 @flask_app.route('/logo.png', methods=['GET'])
 def logopng():
@@ -69,16 +88,6 @@ def login():
 
 
 
-@flask_app.route('/get_post', methods=['POST'])
-def get_post():
-    password = request.form.getlist("password")[0]
-    username = request.form.getlist("username")[0]
-    tag = request.form.getlist("tag")[0]
-
-
-    xml_res = get_post_curation.delay(username, password, tag).wait()
-
-    return Response(xml_res, mimetype='text/xml')
 
 
 @flask_app.route('/create_curation', methods=['POST'])
@@ -86,7 +95,7 @@ def create_curation():
     password = request.form.getlist("password")[0]
     username = request.form.getlist("username")[0]
     tag = request.form.getlist("tag")[0]
-    xml_res = create_curation_session.delay(username, password, tag).wait()
+    xml_res = create_curation_session(username, password, tag)
 
     return Response(xml_res, mimetype='text/xml')
 
@@ -112,14 +121,14 @@ def add_post_curation(message_number):
 
 
 
-        success = add_post_curation_celery.delay(username, password,tag,post_link).wait()
+        success = add_post_curation_celery(username, password,tag,post_link)
 
         if success and success["success"]:
             return render_template("add_post.html", title="Curation",form=form, MESSAGE="Post submitted",steps="../")
         else:
             if success and success["error"] == 1002:
                 return render_template("add_post.html", title="Curation", form=form,
-                                       MESSAGE="Post did not submit, incorrect key or glitch in system.")
+                                       MESSAGE="Post did not submit, incorrect key or glitch in system.", steps="../")
 
             return render_template("add_post.html", title="Curation",form=form, MESSAGE="Post did not submit, are you sure you have enough tokens?", steps="../")
 
@@ -143,7 +152,7 @@ def curation():
         username = form.username.data
         password = form.password.data
 
-        post_url = get_post_curation.delay(username, password, form.action.data).wait()
+        post_url = get_post_curation(username, password, form.action.data)
         #flash('getting post {}'.format(
          #   form.username.data))
         print("START")
@@ -170,7 +179,7 @@ def curation():
 
 def update_form():
 
-    object = get_session_list.delay().wait()
+    object = get_session_list()
     buttons = []
     for i in range(len(object["tag_list"])):
         buttons.append((i,object["tag_list"][i]))
@@ -198,7 +207,7 @@ def vote_post(post_name,tag):
         vote = int(form.action.data)
         post_link = post_name
 
-        worked = vote_post_curation.delay(username, password,tag, vote, post_link).wait()
+        worked = vote_post_curation(username, password,tag, vote, post_link)
         if not worked or worked["success"] == False:
             render_template("vote_post.html",title="Curation", form=form, MESSAGE = "VOTE ERROR, please try again: What do you think of: " + post_name, steps="../../")
         else:
@@ -232,7 +241,7 @@ def add_post():
     username = request.form.getlist("username")[0]
     tag = request.form.getlist("tag")[0]
     post_link = request.form.getlist("post-link")[0]
-    xml_res = add_post_curation.delay(username, password, tag, post_link).wait()
+    xml_res = add_post_curation(username, password, tag, post_link)
 
     return Response(xml_res, mimetype='text/xml')
 
@@ -246,7 +255,7 @@ def vote_post1():
     post_link = request.form.getlist("post-link")[0]
     vote = int(request.form.getlist("vote")[0])
 
-    xml_res = vote_post_curation.delay(username, password, tag, vote,post_link).wait()
+    xml_res = vote_post_curation(username, password, tag, vote,post_link)
 
     return Response(xml_res, mimetype='text/xml')
 
@@ -257,17 +266,45 @@ def get_session_lists():
     username = request.form.getlist("username")[0]
 
 
-    xml_res = get_session_list.delay(username, password).wait()
+    xml_res = get_session_list(username, password)
 
     return Response(xml_res, mimetype='text/xml')
 
 
 @flask_app.route('/buy_token', methods=['POST'])
 def buy_tokens():
-    password = request.form.getlist("password")[0]
-    username = request.form.getlist("username")[0]
+    #print(request.form.getlist("token"))
+
+    password = request.form.getlist("key")[0]
+    username = request.form.getlist("account")[0]
     token = request.form.getlist("token")[0]
     amount = int(request.form.getlist("amount")[0])
-    xml_res = buy_token.delay(token,amount,username, password).wait()
+    xml_res = buy_token(token, amount, username, password, False)
+
+    #xml_res = "<info></info>"
+
+    #return Response(xml_res, mimetype='text/xml')
+    if xml_res:
+        if xml_res["success"] == True:
+            return render_template("shop.html",title="Curation", MESSAGE = "Purchase successful")
+
+        elif xml_res["error"] == 10991:
+            return render_template("shop.html",title="Curation", MESSAGE = "Key error")
+        elif xml_res["error"] == 10992:
+            return render_template("shop.html",title="Curation", MESSAGE = "Steem connection error")
+
+
+
+    return render_template("shop.html",title="Curation", MESSAGE = "Connection error")
+
+
+
+
+@flask_app.route('/get_post', methods=['POST'])
+def get_post():
+    password = request.form.getlist("password")[0]
+    username = request.form.getlist("username")[0]
+    amount = int(request.form.getlist("amount")[0])
+    xml_res = get_post(token,amount,username, password, True)
 
     return Response(xml_res, mimetype='text/xml')

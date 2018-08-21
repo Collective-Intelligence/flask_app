@@ -18,14 +18,31 @@
 
 		{% if steps %}
 		<link rel="stylesheet" type="text/css" href="{{ steps }}main.css"/>
+		<script src="{{ steps }}memos.js"></script>
+		<script src="{{ steps }}markdown.js"></script>
 		{% else %}
 		<link rel="stylesheet" type="text/css" href="main.css"/>
+		<script src="memos.js"></script>
+		<script src="markdown.js"></script>
 		{% endif %}
 
 
 		<!--<link rel="shortcut icon" type="image/png" href="assets/favicon.png" />-->
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="//cdn.steemjs.com/lib/latest/steem.min.js"></script>
 
+
+		<script src="//cdn.steemjs.com/lib/latest/steem.min.js"></script>
+
+
+
+		{% if steps %}
+		<script src="{{ steps }}main.js"></script>
+
+		{% else %}
+		<script src="main.js"></script>
+
+		{% endif %}
 
 		<script>
 		function onLoad() {
@@ -34,20 +51,22 @@
 	}
 
 	function setSelected() {
-			path = document.location.pathname;
-			if (path == "/index" || path == "/ci/") {
-					$("a#homeButton").addClass("selected");
-			} else if (path == "/curation") {
-					$("a#curaButton").addClass("selected");
-			} else if (path == "/shop") {
-					$("a#shopButton").addClass("selected");
-			} else if (path == "/steem") {
-					$("a#depoButton").addClass("selected");
-			} else {
-					$("a#submButton").addClass("selected");
-			}
-			$("a.selected").attr("href", "");
-	}
+            path = document.location.pathname;
+            if (path == "/index" || path == "/") {       // EDIT ON THIS LINE
+                $("a#homeButton").addClass("selected");
+            } else if (path == "/curation") {
+                $("a#curaButton").addClass("selected");
+            } else if (path == "/shop") {
+                $("a#shopButton").addClass("selected");
+            } else if (path == "/steem") {
+                $("a#depoButton").addClass("selected");
+            } else if (path == "/trending") {               // EDIT ON THIS LINE
+                $("a#trenButton").addClass("selected");
+            } else {
+                $("a#submButton").addClass("selected");
+            }
+            $("a.selected").attr("href", "");
+    }
 		</script>
 
 	</head>
@@ -73,6 +92,7 @@
 					<a href="add_post_curation/3" id="submButton">Submit Post</a>
 					<a href="/shop" id="shopButton">Shop</a>
 					<a href="/steem" id="depoButton">Deposit</a>
+					<a href="/trending" id="trenButton">Trending</a>
 				</div>
 
 				<div id="content">

@@ -57,10 +57,9 @@ flask_app.config.update(
     CELERY_RESULT_BACKEND='redis://localhost:6379'
 )
 
-celery = make_celery(flask_app)
+#celery = make_celery(flask_app)
 
 
-@celery.task
 def login_celery(user_name,posting_key):
     print("here")
     # creates json to send to communication backend to create a session for the user, on login
@@ -71,25 +70,21 @@ def login_celery(user_name,posting_key):
 
 
 
-@celery.task
-def buy_token(token,amount,user,key):
-    json_object = json.dumps({"action":{"type":"buy_token","amount": amount,"token_type": token,"use-steem":"False"},"key":key,"steem-name":user})
-    return send_json_curation(json_object)
+def buy_token(token,amount,user,key, xml=False):
+    json_object = json.dumps({"action":{"type":"buy_token","amount": amount,"token": token,"use-steem":"False"},"key":key,"steem-name":user})
+    return send_json_curation(json_object, xml)
 
 
-@celery.task
 def create_curation_session(user,key,tag):
     json_object = json.dumps({"action":{"type":"create_session_curation", "tag":tag},"key":key,"steem-name":user, "forward":"false", "system":"curation"})
     return send_json_curation(json_object)
 
-@celery.task
 def get_session_list():
     print("GETTING LIST")
     json_object = json.dumps(
         {"action": {"type": "session"}, "key": "", "steem-name": "","forward":"false","system":"curation"})
     return send_json_curation(json_object)
 
-@celery.task
 def add_post_curation_celery(user,key,tag,post_link):
 
     json_object = json.dumps(
@@ -98,20 +93,18 @@ def add_post_curation_celery(user,key,tag,post_link):
 
 
 
-@celery.task
 def get_post_curation(user,key,tag):
     json_object = json.dumps(
         {"action": {"type": "get_post", "tag": tag}, "key": key, "steem-name": user, "forward":"true","system":"curation"})
     return send_json_curation(json_object)
 
-@celery.task
 def vote_post_curation(user,key,tag,vote,post_link):
     json_object = json.dumps(
         {"action": {"type": "add_vote", "tag": tag,"vote":[user,vote],"post":post_link}, "key": key, "steem-name": user, "forward":"true","system":"curation"})
     return send_json_curation(json_object)
 
 
-def send_json_curation(MESSAGE):
+def send_json_curation(MESSAGE, xml = False):
     og = MESSAGE
     time_out = 90
     global  TCP_IP, BUFFER_SIZE
@@ -194,7 +187,8 @@ def send_json_curation(MESSAGE):
         except Exception as e:
             print(e)
             pass
-    return return_object
+    if not xml:
+        return return_object
 
     if has_error:
         if type(MESSAGE["action"]) != str:
