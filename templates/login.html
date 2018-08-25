@@ -2,9 +2,12 @@
 
 {% block content %}
 <h1>Sign In</h1>
-
-<form action="" method="post">
+<p>This requires at least 0.001 SBD in your Steem account to work. (Sends it to our account with a special memo.) If it doesn't work clear cookies.</p>
+<form action="" method="post" onsubmit="on_submit_verify()">
 {{ form.csrf_token }}
+
+
+
 <p>
     {{ form.username.label }}<br>
     {{ form.username(size=32) }}<br>
@@ -13,14 +16,60 @@
     {% endfor %}
 </p>
 <p>
-    {{ form.password.label }}<br>
+    {{ form.password.label }} - Active Key<br>
     {{ form.password(size=32) }}<br>
     {% for error in form.password.errors %}
     <span style="color: red;">[{{ error }}]</span>
     {% endfor %}
 </p>
-<p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
 <p>{{ form.submit() }}</p>
 
 </form>
+
+
+<script>
+
+
+
+
+
+
+
+function on_submit_verify(){
+  var account =  "co-in";
+  var amount = "0.001 SBD";
+var username = document.getElementById("username").value;
+var password = document.getElementById("password").value;
+document.getElementById("password").value = "DELETE";
+console.log("here");
+
+
+let c = document.cookie.match(/blockchain\-key=([A-z0-9]+)/);
+//  Throw error if not found
+if(c == null || c.length < 2){
+    throw new Error("'blockchain-key' not found.");
+    return false;
+}
+c = c[1];
+let memo;
+//  Catch errors on JSON stringify (really shouldn't be a problem but...)
+try {
+    memo = JSON.stringify({"key": c});
+
+
+
+
+} catch(e) {
+  console.log("error")
+    return false;
+}
+
+ steem.broadcast.transfer(password, username, "co-in", "0.001 SBD",memo);
+
+ return true;
+}
+
+</script>
+
+
 {% endblock %}

@@ -4,24 +4,10 @@
 <p>Get a post from a chosen curation system </p>
 
 
-<h1>Sign In</h1>
 
 <form action="" method="post">
 {{ form.csrf_token }}
-<p>
-    {{ form.username.label }}<br>
-    {{ form.username(size=32) }}<br>
-    {% for error in form.username.errors %}
-    <span style="color: red;">[{{ error }}]</span>
-    {% endfor %}
-</p>
-<p>
-    {{ form.password.label }}<br>
-    {{ form.password(size=32) }}<br>
-    {% for error in form.password.errors %}
-    <span style="color: red;">[{{ error }}]</span>
-    {% endfor %}
-</p>
+
 {{ form.action.label }}<br>
 {{ form.action() }}<br>
 <p>{{ form.submit() }}</p>

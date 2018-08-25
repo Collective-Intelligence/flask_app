@@ -1,23 +1,28 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField, form
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField, form, IntegerField
 from wtforms.validators import DataRequired
 #from flask_app import *
 import time
 import threading
 
-curation_systems = [("general","general"), ("LGBT","LGBT")]
+curation_systems = [("STEM","STEM"), ("LGBT","LGBT"), ("humor","humor"), ("politics/economics","politics/economics")
+                    , ("art","art"), ("blog/writing","blog/writing"), ("TIL","TIL"), ("news", "news")]
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
-    password = StringField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
 
-    remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
-    pass
+
+
+class DepositForm(FlaskForm):
+
+    password = PasswordField('Password', validators=[DataRequired()])
+    amount = IntegerField('Amount', validators=[DataRequired()])
+
+    submit = SubmitField('Send Steem')
 
 
 class get_post(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = StringField('Password', validators=[DataRequired()])
     last_check_time = time.time()
     print("DOING GET SESSION LIST")
     print("HERE")
@@ -30,7 +35,7 @@ class get_post(FlaskForm):
     locks = {"update":threading.Lock(), "time":threading.Lock()}
 
 
-    submit = SubmitField('Sign In')
+    submit = SubmitField('Get post')
 #    def update(self):
  #       self.action = RadioField(label='Which system do you want to rate a post from?', choices=self.buttons)
       #  pass
@@ -41,10 +46,8 @@ class vote_post(FlaskForm):
         ('0', 'Average post'),
         ('1', 'Good Post'),
     ]
-    username = StringField('Username', validators=[DataRequired()])
-    password = StringField('Password', validators=[DataRequired()])
     action = RadioField(label='What is your opinion on the post?',choices=actions)
-    submit = SubmitField('Sign In')
+    submit = SubmitField('Vote post')
 
 
 
@@ -54,9 +57,7 @@ class submit_post(FlaskForm):
 
     global curation_systems
     actions = curation_systems
-    username = StringField('Username', validators=[DataRequired()])
-    password = StringField('Password', validators=[DataRequired()])
     post_link = StringField('Post Link', validators=[DataRequired()])
 
     action = RadioField(label='What system do you want to add a post to?',choices=actions)
-    submit = SubmitField('Sign In')
+    submit = SubmitField('Submit post')

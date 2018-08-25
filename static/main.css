@@ -10,6 +10,15 @@ div#left {
 	max-width: 200px;
 	position: fixed;
 }
+
+
+div#topright {
+    position: fixed;
+    top: 0%;
+    right: 0;
+    width: 80px;
+}
+
 div#right {
 	display: inline-block;
 	vertical-align: top;
@@ -205,3 +214,41 @@ p {
   line-height: 2.5rem;
   width: 5rem;
 }
+
+
+.tokens__item {
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-bottom: 0.5rem; }
+  .tokens__item .tokens__amount {
+    font-size: 20px;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: right;
+    vertical-align: bottom; }
+  .tokens__item .tokens__icon {
+    background: #111;
+    border-radius: 50%;
+    color: white;
+    font-size: 2rem;
+    line-height: 4rem;
+    padding: 0.5rem;
+    text-align: center;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+    width: 4rem; }
+  .tokens__item .tokens__label {
+    font-size: 12px;
+    font-size: 1.2rem;
+    border-top: 0.2rem solid #111;
+    line-height: 1;
+    text-align: right;
+    vertical-align: top; }
+  .tokens__item .tokens__table {
+    width: 100%; }
+  .tokens__item .tokens__token {
+    line-height: 1;
+    vertical-align: top;
+    width: 5rem; }

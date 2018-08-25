@@ -1,8 +1,100 @@
 {% extends "base.html" %}
 {% block content %}
 
+<h1>Get GP</h1>
+<p>At this time, sending Steem to the co-in-memo account will get roughly the same amount of GP put into your CI account.</p>
+
+<form action="" method="post" onsubmit="on_submit_verify()">
+{{ form.csrf_token }}
 <p>
-To deposit steem to buy tokens you will have to send it to the accoutn co-in-memo as steem. SBD, vests, or anything else will not be accepted and will not be returned. 
+    {{ form.amount.label }} - (whole numbers only, measured in steem)<br>
+    {{ form.amount(size=2) }}<br>
+    {% for error in form.amount.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
 </p>
+<p>
+    {{ form.password.label }} - Active Key<br>
+    {{ form.password(size=32) }}<br>
+    {% for error in form.password.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+</p>
+<p>{{ form.submit() }}</p>
+
+</form>
+
+
+<script>
+
+
+
+const
+    VERIFIER = "co-in-memo";
+
+/**
+ *  @function verifyAccount
+ *  @arg {string} wif User's `wif` whatever that means
+ *  @arg {string} account User's account thing
+ *  @arg {function} callback Callback function to handle errors and returns.
+ */
+
+
+function verifyAccount(wif, account, callback){
+    //  Check if callback is a function (default to blank if not)
+    if(typeof callback !== "function"){
+        var callback = (e,r)=>{return 1};
+    }
+    //  Check if wif is a string
+    if(typeof wif !== "string"){
+        let e = `wif must be a string`;
+        callback(e, null);
+        throw new TypeError(e);
+        return false;
+    }
+    //  Check if account is a string
+    if(typeof account !== "string"){
+        let e = `account must be a string`
+        callback(e, null);
+        throw new TypeError(e);
+        return false;
+    }
+    //  Check cookies for blockchain-key
+
+
+    //  Catch errors on JSON stringify (really shouldn't be a problem but...)
+
+    //  Make call to steem.js
+    var transaction_amount =  document.getElementById("amount").value + ".000 STEEM";
+    console.log(transaction_amount, account, VERIFIER)
+
+  steem.broadcast.transfer(wif, account, VERIFIER, transaction_amount, "", (e,r)=>{
+        if(e !== null){
+            callback(e, null);
+            return false;
+        } else {
+            callback(null, r);
+            return true;
+        }
+    });
+    console.log("done");
+    return true;
+}
+
+
+function on_submit_verify(){
+
+var username =  "{{ name }}";
+var password = document.getElementById("password").value;
+document.getElementById("password").value = "DELETE";
+console.log("here");
+return verifyAccount(password, username);
+
+
+
+}
+</script>
+
+
 
 {% endblock %}

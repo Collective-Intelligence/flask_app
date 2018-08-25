@@ -1,5 +1,6 @@
 import flask_app
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, make_response
+import time
 from flask import Response
 from flask_app import forms
 from flask_app import *
@@ -11,19 +12,85 @@ from flask import send_from_directory
 @flask_app.route('/', methods=['GET'])
 @flask_app.route('/index', methods=['GET'])
 def index():
-    return render_template('index.html', title='Home')
+    if not request.cookies.get('account'):
+
+        return render_template('index.html', name=request.cookies.get('account'))
+    else:
+        return render_template('index.html', name=request.cookies.get('account'), active="True")
+
+
+#@flask_app.route('/steem', methods=['GET', "POST"])
+@flask_app.route('/login', methods=['GET', "POST"])
+def login():
+    form = forms.LoginForm()
+    #form = forms.DepositForm()
+
+
+    res = make_response(render_template('login.html', name="", form=form))
+    if not request.cookies.get('session-key'):
+        keys = get_keys()
+        if keys:
+            if keys["success"]:
+                res = make_response(render_template('login.html', name="", form=form))
+
+                res.set_cookie("session-key",keys["keys"][0], max_age=60 * 60 * 6)
+                res.set_cookie("blockchain-key",keys["keys"][1], max_age=60 * 60 * 6)
+                return res
+        else:
+            time.sleep(1)
+            return redirect("/login")
+        #res.set_cookie('account', "name", max_age=60*60*6)
+    res = make_response(render_template('login.html', name=request.cookies.get("account"), form=form))
+
+
+
+
+    if form.validate_on_submit():
+        res = make_response(redirect("/index"))
+
+        time.sleep(6)
+        # checks if user key is correct
+        res.set_cookie("account", form.username.data,  max_age=60 * 60 * 5.9)
+        check_key_json = activate_key(form.username.data, request.cookies.get('session-key'))
+        print("FORM VALID ON SUBMIT")
+        print(check_key_json)
+        if check_key_json:
+            if check_key_json["success"]:
+                res.set_cookie("active", "True",  max_age=60 * 60 * 5.9)
+                return res
+    #request.cookies.get('account')
+    return render_template('login.html', name=request.cookies.get('account'), form=form)
 
 @flask_app.route('/trending', methods=['GET'])
 def trending():
-    return render_template('trending.html', title='Home')
+    if not request.cookies.get('account'):
+
+        return render_template('trending.html', name=request.cookies.get('account'))
+    else:
+        return render_template('trending.html', name=request.cookies.get('account'), active="True")
+
+
 
 @flask_app.route('/shop', methods=['GET'])
 def shop():
-    return render_template('shop.html', title='Shop', MESSAGE="")
+    if not request.cookies.get('active'):
+        return redirect("/login")
+    else:
+        key = request.cookies.get("session-key")
+    return render_template('shop.html', name=request.cookies.get('account'), MESSAGE="", active="True")
 
-@flask_app.route('/steem', methods=['GET'])
-def dep():
-    return render_template('steem.html', title='Steem')
+@flask_app.route('/steem', methods=['GET', "POST"])
+def steem():
+    if not request.cookies.get('active'):
+        return redirect("/login")
+    else:
+        key = request.cookies.get("session-key")
+    form = forms.DepositForm()
+    if form.validate_on_submit():
+        time.sleep(6)
+     #   return render_template('steem.html', name=request.cookies.get('account'), form=form)
+
+    return render_template('steem.html', name=request.cookies.get('account'), form=form, active="true")
 
 @flask_app.route('/main.css', methods=['GET'])
 def maincss():
@@ -39,6 +106,12 @@ def memos():
     return send_from_directory("static",
                                "memos.js")
 
+
+@flask_app.route('/getAccount.js', methods=['GET'])
+def getaccount():
+    return send_from_directory("static",
+                               "getAccount.js")
+
 @flask_app.route('/logo.png', methods=['GET'])
 def logopng():
     return send_from_directory("static",
@@ -46,8 +119,8 @@ def logopng():
 
 
 
-@flask_app.route('/login', methods=["GET",'POST'])
-def login():
+@flask_app.route('/login_old', methods=["GET",'POST'])
+def login_old():
     form = forms.LoginForm()
     if form.validate_on_submit():
         flash('Login requested for user {}, remember_me={}'.format(
@@ -82,7 +155,7 @@ def login():
             #return Response(xml_res, mimetype='text/xml')
 
 
-    return render_template("login.html",form=form,title="Login")
+    return render_template("login.html",form=form,name=request.cookies.get('account'))
 
 
 
@@ -92,6 +165,7 @@ def login():
 
 @flask_app.route('/create_curation', methods=['POST'])
 def create_curation():
+    return
     password = request.form.getlist("password")[0]
     username = request.form.getlist("username")[0]
     tag = request.form.getlist("tag")[0]
@@ -101,6 +175,14 @@ def create_curation():
 
 @flask_app.route("/add_post_curation/<int:message_number>", methods=["GET", "POST"])
 def add_post_curation(message_number):
+    if not request.cookies.get('active'):
+        return redirect("/login")
+    else:
+        key = request.cookies.get("session-key")
+        account = request.cookies.get("account")
+
+
+
     print(type(message_number))
     form = forms.submit_post()
     if message_number == 0:
@@ -113,8 +195,8 @@ def add_post_curation(message_number):
         message = "Submit a post to the curation system"
     if form.validate_on_submit():
 
-        password = request.form.getlist("password")[0]
-        username = request.form.getlist("username")[0]
+        password = key
+        username = account
         tag = form.action.data
         print(tag)
         post_link = request.form.getlist("post_link")[0]
@@ -124,22 +206,28 @@ def add_post_curation(message_number):
         success = add_post_curation_celery(username, password,tag,post_link)
 
         if success and success["success"]:
-            return render_template("add_post.html", title="Curation",form=form, MESSAGE="Post submitted",steps="../")
+            return render_template("add_post.html", name=request.cookies.get('account'),form=form, MESSAGE="Post submitted",steps="../", active="true")
         else:
             if success and success["error"] == 1002:
-                return render_template("add_post.html", title="Curation", form=form,
-                                       MESSAGE="Post did not submit, incorrect key or glitch in system.", steps="../")
+                return render_template("add_post.html", name=request.cookies.get('account'), form=form,
+                                       MESSAGE="Post did not submit, two posts by the same author are not allowed (or maybe it just glitched, who knows).", steps="../",active="true")
 
-            return render_template("add_post.html", title="Curation",form=form, MESSAGE="Post did not submit, are you sure you have enough tokens?", steps="../")
+            return render_template("add_post.html", name=request.cookies.get('account'),form=form, MESSAGE="Post did not submit, are you sure you have enough tokens?", steps="../",active="true")
 
 
-    return render_template("add_post.html",title="Curation", form=form, MESSAGE=message, steps="../")
+    return render_template("add_post.html",name=request.cookies.get('account'), form=form, MESSAGE=message, steps="../",active="true")
 
     pass
 
 
 @flask_app.route('/curation', methods=["GET", "POST"])
 def curation():
+    if not request.cookies.get('active'):
+        return redirect("/login")
+    else:
+        key = request.cookies.get("session-key")
+        account = request.cookies.get("account")
+
     with forms.get_post.locks["update"]:
         form = forms.get_post()
         if random.randrange(100) > 98:
@@ -149,8 +237,8 @@ def curation():
     #print(form.update())
 
     if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
+        username = account
+        password = key
 
         post_url = get_post_curation(username, password, form.action.data)
         #flash('getting post {}'.format(
@@ -175,7 +263,7 @@ def curation():
     print("END HERE")
 
 
-    return render_template("curation.html",title="Curation", form=form)
+    return render_template("curation.html",name=request.cookies.get('account'), form=form,active="true")
 
 def update_form():
 
@@ -191,6 +279,12 @@ def update_form():
 
 @flask_app.route('/vote_post/<string:post_name>/<string:tag>', methods=["GET","POST"])
 def vote_post(post_name,tag):
+    if not request.cookies.get('active'):
+        return redirect("/login")
+    else:
+        key = request.cookies.get("session-key")
+        account = request.cookies.get("account")
+
     print("STARTING VOTE POST")
     new_post_name = ""
     for i in post_name:
@@ -202,17 +296,17 @@ def vote_post(post_name,tag):
     form = forms.vote_post()
 
     if form.validate_on_submit():
-        password = request.form.getlist("password")[0]
-        username = request.form.getlist("username")[0]
+        password = key
+        username = account
         vote = int(form.action.data)
         post_link = post_name
 
         worked = vote_post_curation(username, password,tag, vote, post_link)
         if not worked or worked["success"] == False:
-            render_template("vote_post.html",title="Curation", form=form, MESSAGE = "VOTE ERROR, please try again: What do you think of: " + post_name, steps="../../")
+            render_template("vote_post.html",name=request.cookies.get('account'), form=form, MESSAGE = "VOTE ERROR, please try again: What do you think of: " + post_name, steps="../../", active="true")
         else:
             return redirect("/curation")
-    return render_template("vote_post.html",title="Curation", form=form, MESSAGE = "What do you think of: " + post_name, steps="../../")
+    return render_template("vote_post.html",name=request.cookies.get('account'), form=form, MESSAGE = "What do you think of: " + post_name, steps="../../", active="true")
 
     pass
 
@@ -271,12 +365,32 @@ def get_session_lists():
     return Response(xml_res, mimetype='text/xml')
 
 
+@flask_app.route("/logout", methods=["GET"])
+def logout():
+    cookie_list = ["active", "session-key", "blockchain-key", "account"]
+    delete_key(request.cookies.get('account'),request.cookies.get('session-key'))
+    resp = make_response(redirect("/login"))
+
+    for i in cookie_list:
+        try:
+            resp.set_cookie(i, '', expires=0)
+        except:
+            pass
+
+    return resp
+
 @flask_app.route('/buy_token', methods=['POST'])
 def buy_tokens():
+    if not request.cookies.get('active'):
+        return redirect("/login")
+    else:
+        key = request.cookies.get("session-key")
+        account = request.cookies.get("account")
+
     #print(request.form.getlist("token"))
 
-    password = request.form.getlist("key")[0]
-    username = request.form.getlist("account")[0]
+    password = key
+    username = account
     token = request.form.getlist("token")[0]
     amount = int(request.form.getlist("amount")[0])
     xml_res = buy_token(token, amount, username, password, False)
@@ -286,16 +400,16 @@ def buy_tokens():
     #return Response(xml_res, mimetype='text/xml')
     if xml_res:
         if xml_res["success"] == True:
-            return render_template("shop.html",title="Curation", MESSAGE = "Purchase successful")
+            return render_template("shop.html",name=request.cookies.get('account'), MESSAGE = "Purchase successful")
 
         elif xml_res["error"] == 10991:
-            return render_template("shop.html",title="Curation", MESSAGE = "Key error")
+            return redirect("/login")
         elif xml_res["error"] == 10992:
-            return render_template("shop.html",title="Curation", MESSAGE = "Steem connection error")
+            return render_template("shop.html",name=request.cookies.get('account'), MESSAGE = "Steem connection error")
 
 
 
-    return render_template("shop.html",title="Curation", MESSAGE = "Connection error")
+    return render_template("shop.html",name=request.cookies.get('account'), MESSAGE = "Connection error")
 
 
 

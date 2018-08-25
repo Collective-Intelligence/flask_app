@@ -7,9 +7,9 @@
     <div class="module__content">
         <form class="shop__form"  action= "/buy_token" method="POST">
             <select name="token" onchange="_ci.s.ui.select(this)">
-                <option value="token-upvote-perm">Buying Upvote Tokens</option>
-                <option value="adp_tok">Buying Post Tokens</option>
-                <option value="ad-token-perm">Buying Ad Tokens</option>
+                <option value="token-upvote-perm">Buying Upvote Tokens - 0.5 GP ea</option>
+                <option value="adp_tok">Buying Post Tokens - 0.05 GP ea</option>
+                <option value="ad-token-perm">Buying Ad Tokens - 0.75 GP ea</option>
             </select>
             <div class="shop__token">
                 <div class="material-icons shop__token-icon">thumb_up</div>
@@ -22,10 +22,7 @@
                         <div class="material-icons shop__form-account-icon">account_circle</div>
                     </td>
                     <td>
-                        Account:
-                        <input type="text" name="account" placeholder="Account Name"/><br>
-                        Key:
-                        <input type="password" name="key" placeholder="Key"/><br>
+
                     </td>
                     <td>
                         <input class="button shop__form-submit" type="submit" value="Buy">
@@ -36,34 +33,122 @@
     </div>
 </div>
 
+
+
+
+
+
+
+
+
+
+<div
+    class="card module tokens"
+>
+    <div class="module__content">
+        <div class="tokens__item">
+            <table class="tokens__table">
+                <tr>
+                    <td class="tokens__token">
+                        <div class="material-icons tokens__icon">thumb_up</div>
+                    </td>
+                    <td>
+                        <table style="width: 100%;">
+                            <tr>
+                                <td class="tokens__amount" id="tokens__amount-upvote">
+                                    0
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="tokens__label">
+                                    Upvote Tokens
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="tokens__item">
+            <table class="tokens__table">
+                <tr>
+                    <td class="tokens__token">
+                        <div class="material-icons tokens__icon">add_comment</div>
+                    </td>
+                    <td>
+                        <table style="width: 100%;">
+                            <tr>
+                                <td class="tokens__amount" id="tokens__amount-post">
+                                    0
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="tokens__label">
+                                    Post Tokens
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="tokens__item">
+            <table class="tokens__table">
+                <tr>
+                    <td class="tokens__token">
+                        <div class="material-icons tokens__icon">visibility</div>
+                    </td>
+                    <td>
+                        <table style="width: 100%;">
+                            <tr>
+                                <td class="tokens__amount" id="tokens__amount-ad">
+                                    0
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="tokens__label">
+                                    Ad Tokens
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
 <script>
 
+/**
+ *  @function populateTokens fills out tokens display
+ *  @arg {string} account Account name
+ *  @arg {number} amount Amount of memos to check for user info
+ */
+function populateTokens(amount=50){
+  console.log("start")
 
-
-
-
-select(e){
-    let s;
-    switch(e.value){
-        case "token-upvote-perm":
-            s = "thumb_up";
-            break;
-        case "adp_tok":
-            s = "add_comment";
-            break;
-        case "ad-token-perm":
-            // s = "trending_up";
-            s = "visibility";
-            break;
-        default:
-            s = "thumb_up";
-    }
-    e.parentElement.getElementsByClassName("shop__token-icon")[0]
-        .innerText = s;
+    getAccount("{{ name }}", amount, (e,r)=>{
+        if(e) return false;
+        document.getElementById('tokens__amount-upvote').innerText = r["token-upvote-perm"];
+        document.getElementById('tokens__amount-post').innerText = r["adp_tok"];
+        document.getElementById('tokens__amount-ad').innerText = r["ad-token-perm"];
+    })
 }
 
 
 
+populateTokens()
 </script>
 
 {% endblock %}
